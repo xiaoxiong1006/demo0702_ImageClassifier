@@ -39,6 +39,10 @@ class Classifier(assetManager: AssetManager, modelPath: String, labelPath: Strin
         val scaledBitmap = Bitmap.createScaledBitmap(bitmap, imageSizeX ,imageSizeY, false)
         val byteBuffer = convertBitmapToByteBuffer(scaledBitmap)
         Log.i(this::class.simpleName,"\n=====图片转换成功=====")
+
+        val result = Array(1) { ByteArray(labelList.size) }
+        interpreter.run(byteBuffer, result)
+        Log.i(this::class.simpleName,"\n=====结果是否为空:" + result.isEmpty())
     }
 
     private fun loadModelFile(assetManager: AssetManager, modelPath: String): MappedByteBuffer {
