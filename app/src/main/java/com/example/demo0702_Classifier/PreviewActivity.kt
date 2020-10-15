@@ -1,15 +1,19 @@
 package com.example.demo0702_Classifier
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.graphics.drawable.toBitmap
 import kotlinx.android.synthetic.main.activity_preview.*
 import java.io.File
 
 class PreviewActivity : AppCompatActivity() {
 
     private lateinit var classifier: Classifier
+    private var rgbFrameBitmap: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +40,12 @@ class PreviewActivity : AppCompatActivity() {
 
     private fun initViews() {
         btn_recognition.setOnClickListener {
-            Toast.makeText(this,"准备识别", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(this,"准备识别", Toast.LENGTH_SHORT).show()
+            val drawable: Drawable = img_preview.drawable
+            rgbFrameBitmap = drawable.toBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888)
+
+            rgbFrameBitmap?.let { it1 -> classifier.recognizeImage(it1) }
+
         }
     }
 }
