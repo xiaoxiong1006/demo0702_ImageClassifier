@@ -17,7 +17,7 @@ class PreviewActivity : AppCompatActivity() {
         // 如果地址不为空
         if (!path.isNullOrEmpty()) {
             // 显示照片
-            img_preview.setImageURI(Uri.fromFile(File(path)))
+            img_preview.setImageURI(Uri.parse(path))
         }
 
     }

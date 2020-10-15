@@ -20,7 +20,9 @@ import java.util.concurrent.Executors
 //这是设置请求权限的code码
 private const val REQUEST_CODE_PERMISSIONS = 1
 //这是要获取的拍照权限
-private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE)
+//读取相册的请求码
+private const val IMAGE_REQUEST_CODE = 2
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,12 +38,12 @@ class MainActivity : AppCompatActivity() {
 
         initEvent()
 
-        // 判断是否有拍照的权限
+        // 判断是否有权限
         if (allPermissionsGranted()) {
             //Toast.makeText(this, "已获取拍照权限！", Toast.LENGTH_SHORT).show()
             view_finder.post{ startCamera()}
         } else {
-            //请求拍照权限
+            //请求权限
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
@@ -60,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                 //Toast.makeText(this, "已获取拍照权限！", Toast.LENGTH_SHORT).show()
                 view_finder.post{ startCamera()}
             } else {
-                Toast.makeText(this, "没有拍照权限！！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "没有权限，请授权！", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
@@ -104,7 +106,8 @@ class MainActivity : AppCompatActivity() {
 
                         // 跳转到照片预览窗体
                         val intent = Intent(this@MainActivity, PreviewActivity::class.java)
-                        intent.putExtra("path", file.absolutePath)
+                        var imgUri = Uri.fromFile(File(file.absolutePath))
+                        intent.putExtra("path",imgUri.toString())
                         startActivity(intent)
                     }
                 })
@@ -120,6 +123,25 @@ class MainActivity : AppCompatActivity() {
             startCamera()
         }
 
+        // 从相册中选择
+        btn_photo.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type ="image/*"
+            startActivityForResult(intent, IMAGE_REQUEST_CODE)
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            IMAGE_REQUEST_CODE -> {
+                val imgUri: Uri? = data?.data //获取系统返回的照片的Uri
+                val intent = Intent(this@MainActivity, PreviewActivity::class.java)
+                intent.putExtra("path", imgUri.toString())
+                startActivity(intent)
+            }
+        }
     }
 
     /**
