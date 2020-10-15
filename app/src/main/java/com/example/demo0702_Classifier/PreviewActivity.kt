@@ -44,7 +44,15 @@ class PreviewActivity : AppCompatActivity() {
             val drawable: Drawable = img_preview.drawable
             rgbFrameBitmap = drawable.toBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888)
 
-            rgbFrameBitmap?.let { it1 -> classifier.recognizeImage(it1) }
+            var result = rgbFrameBitmap?.let { it1 -> classifier.recognizeImage(it1) }
+
+            if(result != null) {
+                txt_result_title.text = "识别结果:" + result!!.title
+                txt_result_confidence.text = " 置信度：" + result!!.confidence
+            }else {
+                txt_result_title.text ="没有识别到物体,"
+                txt_result_confidence.text = " 请调整拍照背景和角度。"
+            }
 
         }
     }

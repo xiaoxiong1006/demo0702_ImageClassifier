@@ -18,6 +18,16 @@ class Classifier(assetManager: AssetManager, modelPath: String, labelPath: Strin
     private var imageSizeY:Int
     private var pixelSize:Int
 
+    data class Recognition(
+        var id: String = "",
+        var title: String = "",
+        var confidence: Float = 0F
+    ) {
+        override fun toString(): String {
+            return "Title = $title, Confidence = $confidence"
+        }
+    }
+
     init {
         val tfliteOptions = Interpreter.Options()
         tfliteOptions.setNumThreads(5)
@@ -35,7 +45,7 @@ class Classifier(assetManager: AssetManager, modelPath: String, labelPath: Strin
         pixelSize = imageShape[3]
     }
 
-    fun recognizeImage(bitmap: Bitmap){
+    fun recognizeImage(bitmap: Bitmap):Recognition{
         val scaledBitmap = Bitmap.createScaledBitmap(bitmap, imageSizeX ,imageSizeY, false)
         val byteBuffer = convertBitmapToByteBuffer(scaledBitmap)
         Log.i(this::class.simpleName,"\n=====图片转换成功=====")
@@ -43,7 +53,12 @@ class Classifier(assetManager: AssetManager, modelPath: String, labelPath: Strin
         val result = Array(1) { ByteArray(labelList.size) }
         interpreter.run(byteBuffer, result)
         Log.i(this::class.simpleName,"\n=====结果是否为空:" + result.isEmpty())
+
+        return getResult(result)
+
     }
+
+
 
     private fun loadModelFile(assetManager: AssetManager, modelPath: String): MappedByteBuffer {
         val fileDescriptor = assetManager.openFd(modelPath)
@@ -77,5 +92,25 @@ class Classifier(assetManager: AssetManager, modelPath: String, labelPath: Strin
             }
         }
         return imgData
+    }
+
+    private fun getResult(labelProbArray: Array<ByteArray>):Recognition {
+        Log.i(this::class.simpleName, "List Size:(%d, %d, %d)".format(labelProbArray.size, labelProbArray[0].size, labelList.size))
+
+        var max= 0
+        var recognition=Recognition()
+        for (i in labelList.indices) {
+            val confidence = labelProbArray[0][i]
+            if (confidence > max) {
+                recognition = Recognition("" + i,
+                    if (labelList.size > i) labelList[i] else "Unknown",
+                    ((confidence).toFloat() / 255.0f)
+                )
+            }
+        }
+
+        Log.i(this::class.simpleName, recognition.toString())
+
+        return recognition
     }
 }
