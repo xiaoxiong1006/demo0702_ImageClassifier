@@ -3,6 +3,7 @@ package com.example.demo0702_Classifier
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_preview.*
 import java.io.File
 
@@ -22,6 +23,8 @@ class PreviewActivity : AppCompatActivity() {
             img_preview.setImageURI(Uri.parse(path))
             // 加载模型
             initClassifier()
+            // 点击识别
+            initViews()
         }
     }
 
@@ -29,5 +32,11 @@ class PreviewActivity : AppCompatActivity() {
         classifier = Classifier(assets,
             "mobilenet_v1_1.0_224_quant.tflite",
             "labels_mobilenet_quant_v1_224.txt")
+    }
+
+    private fun initViews() {
+        btn_recognition.setOnClickListener {
+            Toast.makeText(this,"准备识别", Toast.LENGTH_SHORT).show()
+        }
     }
 }
