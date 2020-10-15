@@ -8,6 +8,8 @@ import java.io.File
 
 class PreviewActivity : AppCompatActivity() {
 
+    private lateinit var classifier: Classifier
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preview)
@@ -18,7 +20,14 @@ class PreviewActivity : AppCompatActivity() {
         if (!path.isNullOrEmpty()) {
             // 显示照片
             img_preview.setImageURI(Uri.parse(path))
+            // 加载模型
+            initClassifier()
         }
+    }
 
+    private fun initClassifier() {
+        classifier = Classifier(assets,
+            "mobilenet_v1_1.0_224_quant.tflite",
+            "labels_mobilenet_quant_v1_224.txt")
     }
 }
